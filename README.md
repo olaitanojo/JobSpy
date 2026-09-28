@@ -1,6 +1,18 @@
 <img src="https://github.com/cullenwatson/JobSpy/assets/78247585/ae185b7e-e444-4712-8bb9-fa97f53e896b" width="400">
 
 **JobSpy** is a job scraping library with the goal of aggregating all the jobs from popular job boards with one tool.
+## Fork synchronization
+
+This fork automatically synchronizes its `main` branch with [the upstream repository](https://github.com/speedyapply/JobSpy) through the [`Sync Fork with Upstream`](.github/workflows/sync-upstream.yml) GitHub Actions workflow.
+
+- The workflow checks for upstream updates every five minutes and synchronizes this fork when an update is available.
+- To run it on demand, open the **Actions** tab, select **Sync Fork with Upstream**, then choose **Run workflow**.
+- The workflow uses the repository's built-in `GITHUB_TOKEN`; no personal access token or additional secret is required.
+- Fork-only changes are preserved. If upstream changes conflict with them, the sync run fails rather than overwriting work and requires manual resolution.
+
+### Verify a synchronization
+
+After a scheduled or manual run, open the **Actions** tab and confirm that the latest **Sync Fork with Upstream** run completed successfully. A successful synchronization leaves this fork **0 commits behind** `speedyapply/JobSpy`; fork-only commits can still leave it ahead of upstream and are expected.
 
 ## Features
 
