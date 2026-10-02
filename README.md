@@ -16,7 +16,7 @@ After a scheduled or manual run, open the **Actions** tab and confirm that the l
 
 ## Features
 
-- Scrapes job postings from **LinkedIn**, **Indeed**, **Glassdoor**, **Google**, **ZipRecruiter**, & other job boards concurrently
+- Scrapes job postings from **LinkedIn**, **Indeed**, **Glassdoor**, **ZipRecruiter**, & other job boards concurrently
 - Aggregates the job postings in a dataframe
 - Proxies support to bypass blocking
 
@@ -37,9 +37,8 @@ import csv
 from jobspy import scrape_jobs
 
 jobs = scrape_jobs(
-    site_name=["indeed", "linkedin", "zip_recruiter", "google"], # "glassdoor", "bayt", "naukri", "bdjobs"
+    site_name=["indeed", "linkedin", "zip_recruiter", "glassdoor"], # "bayt", "naukri", "bdjobs"
     search_term="software engineer",
-    google_search_term="software engineer jobs near San Francisco, CA since yesterday",
     location="San Francisco, CA",
     results_wanted=20,
     hours_old=72,
@@ -114,7 +113,7 @@ Optional
 │
 ├── verbose (int) {0, 1, 2}: 
 |    Controls the verbosity of the runtime printouts 
-|    (0 prints only errors, 1 is errors+warnings, 2 is all logs. Default is 2.)
+|    (0 prints only errors, 1 is errors+warnings, 2 is all logs. Default is 0.)
 
 ├── fetch_description (bool): 
 |    for boards whose search results don't include the job description: fetches each job's
@@ -188,6 +187,7 @@ Naukri searches India. `location` takes a city, e.g. `"Pune"`.
 
 ## Notes
 * Indeed is the best scraper currently with no rate limiting.  
+* Indeed filters `hours_old` on when a job was added to Indeed, while `date_posted` is when the employer published it, so it can be older.  
 * All the job board endpoints are capped at around 1000 jobs on a given search.  
 * LinkedIn is the most restrictive and usually rate limits around the 10th page with one ip. Proxies are a must basically.
 * Glassdoor rate limits after about 30 requests per ip, which `fetch_description` reaches quickly.
@@ -211,7 +211,7 @@ This searches the description/title and must include software, summer, 2025, one
 ---
 
 **Q: No results when using "google"?**  
-**A:** You have to use super specific syntax. Search for google jobs on your browser and then whatever pops up in the google jobs search box after applying some filters is what you need to copy & paste into the google_search_term. 
+**A:** Google Jobs is currently unavailable.
 
 ---
 
