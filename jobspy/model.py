@@ -215,17 +215,6 @@ class CompensationInterval(Enum):
     DAILY = "daily"
     HOURLY = "hourly"
 
-    @classmethod
-    def get_interval(cls, pay_period):
-        interval_mapping = {
-            "YEAR": cls.YEARLY,
-            "HOUR": cls.HOURLY,
-        }
-        if pay_period in interval_mapping:
-            return interval_mapping[pay_period].value
-        else:
-            return cls[pay_period].value if pay_period in cls.__members__ else None
-
 
 class Compensation(BaseModel):
     interval: Optional[CompensationInterval] = None
@@ -296,7 +285,6 @@ class SalarySource(Enum):
 
 
 class ScraperInput(BaseModel):
-    site_type: list[Site]
     search_term: str | None = None
     google_search_term: str | None = None
 
@@ -325,12 +313,13 @@ class ScraperInput(BaseModel):
 
 class Scraper(ABC):
     def __init__(
-        self, site: Site, proxies: list[str] | None = None, ca_cert: str | None = None, user_agent: str | None = None
+        self, proxies: list[str] | None = None, ca_cert: str | None = None, user_agent: str | None = None
     ):
-        self.site = site
         self.proxies = proxies
         self.ca_cert = ca_cert
         self.user_agent = user_agent
+        self.session = None
+        self.scraper_input = None
 
     @abstractmethod
     def scrape(self, scraper_input: ScraperInput) -> JobResponse: ...

@@ -7,21 +7,20 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 
-from jobspy.bayt import BaytScraper
+from jobspy.bayt import Bayt
 from jobspy.bdjobs import BDJobs
 from jobspy.glassdoor import Glassdoor
 from jobspy.google import Google
 from jobspy.indeed import Indeed
 from jobspy.linkedin import LinkedIn
 from jobspy.naukri import Naukri
-from jobspy.model import JobType as JobType
 from jobspy.model import Location, JobResponse, Country
 from jobspy.model import SalarySource, ScraperInput, Site
 from jobspy.util import (
     set_logger_level,
     extract_salary,
     create_logger,
-    get_enum_from_value,
+    get_enum_from_job_type,
     map_str_to_site,
     convert_to_annual,
     desired_order,
@@ -65,7 +64,7 @@ def scrape_jobs(
         Site.ZIP_RECRUITER: ZipRecruiter,
         Site.GLASSDOOR: Glassdoor,
         Site.GOOGLE: Google,
-        Site.BAYT: BaytScraper,
+        Site.BAYT: Bayt,
         Site.NAUKRI: Naukri,
         Site.BDJOBS: BDJobs,
     }
@@ -91,7 +90,11 @@ def scrape_jobs(
             FutureWarning,
             stacklevel=2,
         )
-    job_type = get_enum_from_value(job_type) if job_type else None
+    job_type_name, job_type = job_type, None
+    if job_type_name:
+        job_type = get_enum_from_job_type(job_type_name)
+        if not job_type:
+            raise Exception(f"Invalid job type: {job_type_name}")
 
     if isinstance(site_name, (list, tuple, set)):
         sites = site_name
@@ -109,7 +112,6 @@ def scrape_jobs(
     country_enum = Country.from_string(country_indeed)
 
     scraper_input = ScraperInput(
-        site_type=site_type,
         country=country_enum,
         search_term=search_term,
         google_search_term=google_search_term,
@@ -131,9 +133,7 @@ def scrape_jobs(
         scraper_class = SCRAPER_MAPPING[site]
         scraper = scraper_class(proxies=proxies, ca_cert=ca_cert, user_agent=user_agent)
         scraped_data: JobResponse = scraper.scrape(scraper_input)
-        create_logger(scraper_class.__name__.removesuffix("Scraper")).info(
-            "finished scraping"
-        )
+        create_logger(scraper_class.__name__).info("finished scraping")
         return site.value, scraped_data
 
     with ThreadPoolExecutor() as executor:
